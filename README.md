@@ -1,2 +1,2 @@
-# pay-woocommerce-plugin
+# GOPay Woocommerce Plugin
 A payment plugin for GOPay
