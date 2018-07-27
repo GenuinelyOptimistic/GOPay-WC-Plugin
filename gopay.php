@@ -144,7 +144,7 @@ function wc_gopayment_gateway_init() {
 			$this->icon               = apply_filters('woocommerce_offline_icon', '');
 			$this->has_fields         = false;
 			$this->method_title       = __( 'GOPay', 'wc-gopay' );
-			$this->method_description = __( 'Allows users to pay with GOPay.', 'wc-gopay' );
+			$this->method_description = __( 'GOPay redirects customers to GOPay to login to their account and confirm payment.', 'wc-gopay' );
 		  
 			// Load the settings.
 			$this->init_form_fields();
