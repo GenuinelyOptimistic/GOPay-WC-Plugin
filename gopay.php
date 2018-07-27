@@ -189,7 +189,7 @@ function wc_gopayment_gateway_init() {
 		public function init_form_fields() {
 			$this->form_fields = apply_filters( 'wc_gopayment_form_fields', array(
 				'enabled' => array(
-					'title'   => __( '', 'wc-gopay' ),
+					'title'   => __( 'Enabled/Disabled', 'wc-gopay' ),
 					'type'    => 'checkbox',
 					'label'   => __( 'Enable GOPay Payment', 'wc-gopay' ),
 					'default' => 'yes'
@@ -230,7 +230,7 @@ function wc_gopayment_gateway_init() {
 					'desc_tip'    => true,
 				),
 				'test_mode' => array(
-					'title'   => __( '', 'wc-gopay' ),
+					'title'   => __( 'Enable/Disable Test Mode', 'wc-gopay' ),
 					'type'    => 'checkbox',
 					'label'   => __( 'Enable Test Mode', 'wc-gopay' ),
 					'default' => 'yes'
@@ -279,8 +279,7 @@ function wc_gopayment_gateway_init() {
 
 			// Get this Order's information so that we know
 			// who to charge and how much
-			$order = wc_get_order( $order_id );
-			
+			$order = new WC_Order( $order_id );
 			// // checking for transiction
 			// $environment = ( $this->test_mode == "yes" ) ? 'TRUE' : 'FALSE';
 
@@ -304,10 +303,10 @@ function wc_gopayment_gateway_init() {
 
 				
 				// Order total
-				"amount"             	=> $order->order_total,
+				"amount"             	=> (  WC()->version < '2.7.0' ) ? $order->order_total : $order->get_total(),
 				
 				"type"               	=> 'AUTH_CAPTURE',
-				"invoice_num"        	=> str_replace( "#", "", $order->get_order_number() ),
+				"invoice_num"        	=> str_replace( "#", "", (  WC()->version < '2.7.0' ) ? $order->order_number: $order->get_order_number() ),
 				// "test_request"       	=> $environment,
 				"test_request"       	=> "sdfsdfsdfdsffdsfd",
 				"delim_char"         	=> '|',
@@ -317,95 +316,96 @@ function wc_gopayment_gateway_init() {
 				"method"             	=> "CC",
 				
 				// Billing Information
-				"first_name"         	=> $order->billing_first_name,
-				"last_name"          	=> $order->billing_last_name,
-				"address"            	=> $order->billing_address_1,
-				"city"              	=> $order->billing_city,
-				"state"              	=> $order->billing_state,
-				"zip"                	=> $order->billing_postcode,
-				"country"            	=> $order->billing_country,
-				"phone"              	=> $order->billing_phone,
-				"email"              	=> $order->billing_email,
+				"first_name"         	=> ( WC()->version < '2.7.0' ) ? $order->billing_first_name: $order->get_billing_first_name(),
+				"last_name"          	=> ( WC()->version < '2.7.0' ) ? $order->billing_last_name: $order->get_billing_last_name(),
+				"address"            	=> ( WC()->version < '2.7.0' ) ? $order->billing_address_1: $order->get_billing_address_1(),
+				"city"              	=> ( WC()->version < '2.7.0' ) ? $order->billing_city: $order->get_billing_city(),
+				"state"              	=> ( WC()->version < '2.7.0' ) ? $order->billing_state: $order->get_billing_state(),
+				"zip"                	=> ( WC()->version < '2.7.0' ) ? $order->billing_postcode: $order->get_billing_postcode(),
+				"country"            	=> ( WC()->version < '2.7.0' ) ? $order->billing_country: $order->get_billing_country(),
+				"phone"              	=> ( WC()->version < '2.7.0' ) ? $order->billing_phone: $order->get_billing_phone(),
+				"email"              	=> ( WC()->version < '2.7.0' ) ? $order->billing_email: $order->get_billing_email(),
 				
 				// Shipping Information
-				"ship_to_first_name" 	=> $order->shipping_first_name,
-				"ship_to_last_name"  	=> $order->shipping_last_name,
-				"ship_to_company"    	=> $order->shipping_company,
-				"ship_to_address"    	=> $order->shipping_address_1,
-				"ship_to_city"       	=> $order->shipping_city,
-				"ship_to_country"    	=> $order->shipping_country,
-				"ship_to_state"      	=> $order->shipping_state,
-				"ship_to_zip"        	=> $order->shipping_postcode,
+				"ship_to_first_name" 	=> ( WC()->version < '2.7.0' ) ? $order->shipping_first_name: $order->get_shipping_first_name(),
+				"ship_to_last_name"  	=> ( WC()->version < '2.7.0' ) ? $order->shipping_last_name: $order->get_shipping_last_name(),
+				"ship_to_company"    	=> ( WC()->version < '2.7.0' ) ? $order->shipping_company: $order->get_shipping_company(),
+				"ship_to_address"    	=> ( WC()->version < '2.7.0' ) ? $order->shipping_address_1: $order->get_shipping_address_1(),
+				"ship_to_city"       	=> ( WC()->version < '2.7.0' ) ? $order->shipping_city: $order->get_shipping_city(),
+				"ship_to_country"    	=> ( WC()->version < '2.7.0' ) ? $order->shipping_country: $order->get_shipping_country(),
+				"ship_to_state"      	=> ( WC()->version < '2.7.0' ) ? $order->shipping_state: $order->get_shipping_state(),
+				"ship_to_zip"        	=> ( WC()->version < '2.7.0' ) ? $order->shipping_postcode: $order->get_shipping_postcode(),
 				
 				// Some Customer Information
-				"cust_id"            	=> $order->user_id,
+				"cust_id"            	=> ( WC()->version < '2.7.0' ) ? $order->user_id: $order->get_user_id(),
 				"customer_ip"        	=> $_SERVER['REMOTE_ADDR'],
 			);
-
-			// // Return thankyou redirect 
-			// return array(
-			// 	'result' 	=> 'success',
-			// 	'redirect'	=> add_query_arg('order', $order->id, add_query_arg('key', $order->order_key, get_permalink(get_option('woocommerce_pay_page_id'))))
-			// );
+			print_r($payload);
+			die();
+			// // // Return thankyou redirect 
+			// // return array(
+			// // 	'result' 	=> 'success',
+			// // 	'redirect'	=> add_query_arg('order', $order->id, add_query_arg('key', $order->order_key, get_permalink(get_option('woocommerce_pay_page_id'))))
+			// // );
 					
-			// Send this payload for processing
+			// // Send this payload for processing
 
-			// $response = wp_remote_post( $environment_url, array(
-			$response = wp_remote_post( 'http://localhost/pay/api/v1/order?testmode=true', array(
-				'method'    => 'POST',
-				'body'      => http_build_query( $payload ),
-				'timeout'   => 90,
-				'sslverify' => false,
-			) );
+			// // $response = wp_remote_post( $environment_url, array(
+			// $response = wp_remote_post( 'http://localhost/pay/api/v1/order?testmode=true', array(
+			// 	'method'    => 'POST',
+			// 	'body'      => http_build_query( $payload ),
+			// 	'timeout'   => 90,
+			// 	'sslverify' => false,
+			// ) );
 
-			if ( is_wp_error( $response ) ) 
-				throw new Exception( __( 'We are currently experiencing problems trying to connect to this payment gateway. Sorry for the inconvenience.', '' ) );
+			// if ( is_wp_error( $response ) ) 
+			// 	throw new Exception( __( 'We are currently experiencing problems trying to connect to this payment gateway. Sorry for the inconvenience.', '' ) );
 
-			if ( empty( $response['body'] ) )
-				throw new Exception( __( 'Response was empty.', '' ) );
+			// if ( empty( $response['body'] ) )
+			// 	throw new Exception( __( 'Response was empty.', '' ) );
 		
-			// Retrieve the body's resopnse if no errors found
-			$response_body = wp_remote_retrieve_body( $response );
+			// // Retrieve the body's resopnse if no errors found
+			// $response_body = wp_remote_retrieve_body( $response );
 
-			// Parse the response into something we can read
-			foreach ( preg_split( "/\r?\n/", $response_body ) as $line ) {
-				$resp = explode( "|", $line );
-			}
+			// // Parse the response into something we can read
+			// foreach ( preg_split( "/\r?\n/", $response_body ) as $line ) {
+			// 	$resp = explode( "|", $line );
+			// }
 
-			// Get the values we need
-			$r['response_code']             = $resp[0];
-			$r['response_sub_code']         = $resp[1];
-			$r['response_reason_code']      = $resp[2];
-			$r['response_reason_text']      = $resp[3];
+			// // Get the values we need
+			// $r['response_code']             = $resp[0];
+			// $r['response_sub_code']         = $resp[1];
+			// $r['response_reason_code']      = $resp[2];
+			// $r['response_reason_text']      = $resp[3];
 
-			// Test the code to know if the transaction went through or not.
-			// 1 or 4 means the transaction was a success
-			if ( ( $r['response_code'] == 1 ) || ( $r['response_code'] == 4 ) ) {
-				// Payment has been successful
-				$order->add_order_note( __( 'Authorize.net payment completed.', 'spyr-authorizenet-aim' ) );
+			// // Test the code to know if the transaction went through or not.
+			// // 1 or 4 means the transaction was a success
+			// if ( ( $r['response_code'] == 1 ) || ( $r['response_code'] == 4 ) ) {
+			// 	// Payment has been successful
+			// 	$order->add_order_note( __( 'Authorize.net payment completed.', 'spyr-authorizenet-aim' ) );
 													 
-				// Mark order as Paid
-				$order->payment_complete();
+			// 	// Mark order as Paid
+			// 	$order->payment_complete();
 
-				// Empty the cart (Very important step)
-				$woocommerce->cart->empty_cart();
+			// 	// Empty the cart (Very important step)
+			// 	$woocommerce->cart->empty_cart();
 
-				// Redirect to thank you page
-				return array(
-					'result'   => 'success',
-					'redirect' => $this->get_return_url( $order ),
-				);
-			} else {
-				// Transaction was not succesful
-				// Add notice to the cart
-				wc_add_notice( $r['response_reason_text'], 'error' );
-				// Add note to the order for your reference
-				$order->add_order_note( 'Error: '. $r['response_reason_text'] );
-			}
+			// 	// Redirect to thank you page
+			// 	return array(
+			// 		'result'   => 'success',
+			// 		'redirect' => $this->get_return_url( $order ),
+			// 	);
+			// } else {
+			// 	// Transaction was not succesful
+			// 	// Add notice to the cart
+			// 	wc_add_notice( $r['response_reason_text'], 'error' );
+			// 	// Add note to the order for your reference
+			// 	$order->add_order_note( 'Error: '. $r['response_reason_text'] );
+			// }
 		}
 
-		public function callback_handler(){
-			echo "here";
-		}
+		// public function callback_handler(){
+		// 	echo "here";
+		// }
   } // end \WC_GOPayment class
 }
