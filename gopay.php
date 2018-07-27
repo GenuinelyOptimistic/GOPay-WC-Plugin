@@ -1,22 +1,20 @@
 <?php
 
 /**
- * that starts the plugin.
- *
- * @link              http://wearego.io
+ * @link              www.wearego.com/pay
  * @since             1.0.0
- * @package           Gopay
+ * @package           GoPay
  *
  * @wordpress-plugin
- * Plugin Name:       GOPay
- * Plugin URI:        http://wearego.io/pay/plugin
+ * Plugin Name:       GoPay
+ * Plugin URI:        www.wearego.com/pay
  * Description:       Payment gateway plug-in to connect a Wordpress woocommerce web shop to GOPay
  * Version:           1.0.0
  * Author:            Genuinely Optimistic
- * Author URI:        http://wearego.io
+ * Author URI:        www.wearego.com
  * License:           MIT
  * License URI:       https://github.com/denzildoyle/gopay-woocommerce-plugin/blob/master/LICENSE
- * Text Domain:       gopay
+ * Text Domain:       GOPay
  * Domain Path:       /languages
  */
 
@@ -30,7 +28,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'PLUGIN_NAME_VERSION', '1.0.0' );
+define( 'GOPay', '1.0.0' );
 
 /**
  * The code that runs during plugin activation.
@@ -38,7 +36,7 @@ define( 'PLUGIN_NAME_VERSION', '1.0.0' );
  */
 function activate_gopay() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-gopay-activator.php';
-	Gopay_Activator::activate();
+	GOpay_Activator::activate();
 }
 
 /**
@@ -47,7 +45,7 @@ function activate_gopay() {
  */
 function deactivate_gopay() {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-gopay-deactivator.php';
-	Gopay_Deactivator::deactivate();
+	GOpay_Deactivator::deactivate();
 }
 
 register_activation_hook( __FILE__, 'activate_gopay' );
@@ -70,7 +68,7 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-gopay.php';
  */
 function run_gopay() {
 
-	$plugin = new Gopay();
+	$plugin = new GOpay();
 	$plugin->run();
 
 }
@@ -91,7 +89,7 @@ if ( ! in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins',
  * @return array $gateways all WC gateways + offline gateway
  */
 function wc_gopayment_add_to_gateways( $gateways ) {
-	$gateways[] = 'WC_gopayment';
+	$gateways[] = 'WC_GOPayment';
 	return $gateways;
 }
 add_filter( 'woocommerce_payment_gateways', 'wc_gopayment_add_to_gateways' );
@@ -121,7 +119,7 @@ add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), 'wc_gopayment_
  * Provides an Offline Payment Gateway; mainly for testing purposes.
  * We load it later to ensure WC is loaded first since we're extending it.
  *
- * @class 		WC_gopayment
+ * @class 		WC_GOPayment
  * @extends		WC_Payment_Gateway
  * @version		1.0.0
  * @package		WooCommerce/Classes/Payment
@@ -131,7 +129,7 @@ add_action( 'plugins_loaded', 'wc_gopayment_gateway_init', 11 );
 
 function wc_gopayment_gateway_init() {
 
-	class WC_gopayment extends WC_Payment_Gateway {
+	class WC_GOPayment extends WC_Payment_Gateway {
 
 
         public static $log_enabled = true;
@@ -142,11 +140,11 @@ function wc_gopayment_gateway_init() {
 		 */
 		public function __construct() {
 	  
-			$this->id                 = 'goPay';
+			$this->id                 = 'gopay';
 			$this->icon               = apply_filters('woocommerce_offline_icon', '');
 			$this->has_fields         = false;
-			$this->method_title       = __( 'goPay', 'wc-gopay' );
-			$this->method_description = __( 'Allows users to pay with goPay.', 'wc-gopay' );
+			$this->method_title       = __( 'GOPay', 'wc-gopay' );
+			$this->method_description = __( 'Allows users to pay with GOPay.', 'wc-gopay' );
 		  
 			// Load the settings.
 			$this->init_form_fields();
@@ -200,7 +198,7 @@ function wc_gopayment_gateway_init() {
 					'title'       => __( 'Title', 'wc-gopay' ),
 					'type'        => 'text',
 					'description' => __( 'This controls the title for the payment method the customer sees during checkout.', 'wc-gopay' ),
-					'default'     => __( '', 'wc-gopay' ),
+					'default'     => __( 'GOPay', 'wc-gopay' ),
 					'desc_tip'    => true,
 				),
 				'description' => array(
@@ -214,7 +212,7 @@ function wc_gopayment_gateway_init() {
 					'title'       => __( 'Instructions', 'wc-gopay' ),
 					'type'        => 'textarea',
 					'description' => __( 'Instructions that will be added to the thank you page and emails.', 'wc-gopay' ),
-					'default'     => __( '', 'wc-gopay' ),
+					'default'     => '',
 					'desc_tip'    => true,
 				),
 				'api_key' => array(
@@ -409,5 +407,5 @@ function wc_gopayment_gateway_init() {
 		public function callback_handler(){
 			echo "here";
 		}
-  } // end \WC_goPayment class
+  } // end \WC_GOPayment class
 }
