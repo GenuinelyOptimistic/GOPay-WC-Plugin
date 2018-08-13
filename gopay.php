@@ -274,7 +274,6 @@ function wc_gopayment_gateway_init() {
 		 * @return array
 		 */
 		public function process_payment( $order_id ) {
-	
 			global $woocommerce;
 
 			// Get this Order's information so that we know
@@ -286,9 +285,9 @@ function wc_gopayment_gateway_init() {
 			// // Decide which URL to post to
 			// $environment_url = ( "FALSE" == $environment ) ? 'http://localhost/pay/api/v1/order?testmode=true': 'http://localhost/pay/user/login';
 
-			// // Mark as on-hold (we're awaiting the payment)
-			// $order->update_status( 'on-hold', __( 'Awaiting offline payment', 'wc-gopay' ) );
-			
+			// // Mark as processing (we're awaiting the payment)
+			$order->update_status( 'processing', 'Processing payment.');
+
 			// // Reduce stock levels
 			// $order->reduce_order_stock();
 			
@@ -301,7 +300,6 @@ function wc_gopayment_gateway_init() {
 				// "tran_key"           	=> $this->trans_key,
 				"tran_key"           	=> "dfsdfsdfsdf",
 
-				
 				// Order total
 				"amount"             	=> (  WC()->version < '2.7.0' ) ? $order->order_total : $order->get_total(),
 				
@@ -340,29 +338,29 @@ function wc_gopayment_gateway_init() {
 				"cust_id"            	=> ( WC()->version < '2.7.0' ) ? $order->user_id: $order->get_user_id(),
 				"customer_ip"        	=> $_SERVER['REMOTE_ADDR'],
 			);
-			print_r($payload);
-			die();
+			// $data = $payload;
+			// header('Content-Type: application/json');
+			// echo json_encode($data);
+
 			// // // Return thankyou redirect 
 			// // return array(
 			// // 	'result' 	=> 'success',
 			// // 	'redirect'	=> add_query_arg('order', $order->id, add_query_arg('key', $order->order_key, get_permalink(get_option('woocommerce_pay_page_id'))))
 			// // );
-					
-			// // Send this payload for processing
 
-			// // $response = wp_remote_post( $environment_url, array(
-			// $response = wp_remote_post( 'http://localhost/pay/api/v1/order?testmode=true', array(
-			// 	'method'    => 'POST',
-			// 	'body'      => http_build_query( $payload ),
-			// 	'timeout'   => 90,
-			// 	'sslverify' => false,
-			// ) );
+			// $response = wp_remote_post( $environment_url, array(
+			$response = wp_remote_post( 'http://localhost/pay/api/v1/order?testmode=true', array(
+				'method'    => 'POST',
+				'body'      => http_build_query( $payload ),
+				'timeout'   => 90,
+				'sslverify' => false,
+			));
 
 			// if ( is_wp_error( $response ) ) 
-			// 	throw new Exception( __( 'We are currently experiencing problems trying to connect to this payment gateway. Sorry for the inconvenience.', '' ) );
+			// 	throw new Exception('We are currently experiencing problems trying to connect to this payment gateway. Sorry for the inconvenience.');
 
 			// if ( empty( $response['body'] ) )
-			// 	throw new Exception( __( 'Response was empty.', '' ) );
+			// 	throw new Exception('Response was empty.') );
 		
 			// // Retrieve the body's resopnse if no errors found
 			// $response_body = wp_remote_retrieve_body( $response );
@@ -381,20 +379,20 @@ function wc_gopayment_gateway_init() {
 			// // Test the code to know if the transaction went through or not.
 			// // 1 or 4 means the transaction was a success
 			// if ( ( $r['response_code'] == 1 ) || ( $r['response_code'] == 4 ) ) {
-			// 	// Payment has been successful
-			// 	$order->add_order_note( __( 'Authorize.net payment completed.', 'spyr-authorizenet-aim' ) );
-													 
-			// 	// Mark order as Paid
-			// 	$order->payment_complete();
+			// Payment has been successful
+			$order->update_status( 'completed', 'GOPay payment completed.');
 
-			// 	// Empty the cart (Very important step)
-			// 	$woocommerce->cart->empty_cart();
+			// Mark order as Paid
+			// $order->payment_complete();
 
-			// 	// Redirect to thank you page
-			// 	return array(
-			// 		'result'   => 'success',
-			// 		'redirect' => $this->get_return_url( $order ),
-			// 	);
+			// Empty the cart (Very important step)
+			$woocommerce->cart->empty_cart();
+
+				// Redirect to thank you page
+				return array(
+					'result'   => 'success',
+					'redirect' => $this->get_return_url( $order ),
+				);
 			// } else {
 			// 	// Transaction was not succesful
 			// 	// Add notice to the cart
