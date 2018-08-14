@@ -279,6 +279,7 @@ function wc_gopayment_gateway_init() {
 			// Get this Order's information so that we know
 			// who to charge and how much
 			$order = new WC_Order( $order_id );
+			
 			// // checking for transiction
 			// $environment = ( $this->test_mode == "yes" ) ? 'TRUE' : 'FALSE';
 
@@ -297,6 +298,7 @@ function wc_gopayment_gateway_init() {
 			// This is where the fun stuff begins
 			$payload = array(
 				//API Info
+				"order_id"				=> $order_id,
 				// "tran_key"           	=> $this->trans_key,
 				"tran_key"           	=> "dfsdfsdfsdf",
 
