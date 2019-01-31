@@ -1,13 +1,13 @@
 === GOPay Woocommerce Plugin ===
 
-Contributors: Denzil Doyle
-Donate link: http://wearego.io
-Tags: wordpress, woocommerce, payment
-Requires at least: Wordpress 5.0.3
-Tested up to: Wordpress 5.0.3
-Stable tag: Wordpress 5.0.3
-License: MIT
-License URI: https://github.com/GenuinelyOptimistic/pay-woocommerce-plugin/blob/master/LICENSE
+Contributors: Denzil Doyle  
+Donate link: http://wearego.io  
+Tags: wordpress, woocommerce, payment  
+Requires at least: Wordpress 5.0.3  
+Tested up to: Wordpress 5.0.3  
+Stable tag: Wordpress 5.0.3  
+License: MIT  
+License URI: https://github.com/GenuinelyOptimistic/pay-woocommerce-plugin/blob/master/LICENSE  
 
 A payment plugin for GOPay a Genuinely Optimistic Company
 
