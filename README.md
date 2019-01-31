@@ -1,4 +1,4 @@
-## === GOPay Woocommerce Plugin ===
+## GOPay Woocommerce Plugin
 
 **Contributors:** Denzil Doyle  
 **Donate link:** http://wearego.io  
