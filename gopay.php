@@ -63,7 +63,7 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-gopay.php';
  * Since everything within the plugin is registered via hooks,
  * then kicking off the plugin from this point in the file does
  * not affect the page life cycle.
- *
+ *lo
  * @since    1.0.0
  */
 function run_gopay() {
@@ -162,8 +162,7 @@ function wc_gopayment_gateway_init() {
 			add_action( 'woocommerce_update_options_payment_gateways_' . $this->id, array( $this, 'process_admin_options' ) );
 			add_action( 'woocommerce_thankyou_' . $this->id, array( $this, 'thankyou_page' ) );
 		  	add_action( 'woocommerce_receipt_' . $this->id, array( $this, 'receipt_page' ) );
-			add_action( 'woocommerce_api_wc_' . $this->id , array( $this, 'callback_handler' ) );
-
+			add_action( 'woocommerce_api_' . $this->id, array($this, 'webhook'));
 			// Customer Emails
 			add_action( 'woocommerce_email_before_order_table', array( $this, 'email_instructions' ), 10, 3 );
 		}
@@ -284,10 +283,10 @@ function wc_gopayment_gateway_init() {
 			// $environment = ( $this->test_mode == "yes" ) ? 'TRUE' : 'FALSE';
 
 			// // Decide which URL to post to
-			// $environment_url = ( "FALSE" == $environment ) ? 'http://localhost/pay/api/v1/order?testmode=true': 'http://localhost/pay/user/login';
+			// $environment_url = ( "FALSE" == $environment ) ? 'http://localhost:90/epay/api/v1/order?testmode=true': 'http://localhost:90/epay/user/login';
 
 			// // Mark as processing (we're awaiting the payment)
-			$order->update_status( 'processing', 'Processing payment.');
+			// $order->update_status( 'processing', 'Processing payment.');
 
 			// // Reduce stock levels
 			// $order->reduce_order_stock();
@@ -299,6 +298,7 @@ function wc_gopayment_gateway_init() {
 			$payload = array(
 				//API Info
 				"order_id"				=> $order_id,
+				"merchant_id"			=> 1,
 				// "tran_key"           	=> $this->trans_key,
 				"tran_key"           	=> "dfsdfsdfsdf",
 
@@ -340,23 +340,20 @@ function wc_gopayment_gateway_init() {
 				"cust_id"            	=> ( WC()->version < '2.7.0' ) ? $order->user_id: $order->get_user_id(),
 				"customer_ip"        	=> $_SERVER['REMOTE_ADDR'],
 			);
-			// $data = $payload;
-			// header('Content-Type: application/json');
-			// echo json_encode($data);
 
-			// // // Return thankyou redirect 
-			// // return array(
-			// // 	'result' 	=> 'success',
-			// // 	'redirect'	=> add_query_arg('order', $order->id, add_query_arg('key', $order->order_key, get_permalink(get_option('woocommerce_pay_page_id'))))
-			// // );
+			// Return thankyou redirect 
+			return array(
+				'result' 	=> 'success',
+				'redirect'	=> 'http://localhost:90/epay/'
+			);
 
 			// $response = wp_remote_post( $environment_url, array(
-			$response = wp_remote_post( 'http://localhost/pay/api/v1/order?testmode=true', array(
-				'method'    => 'POST',
-				'body'      => http_build_query( $payload ),
-				'timeout'   => 90,
-				'sslverify' => false,
-			));
+			// $response = wp_remote_post( 'http://localhost:90/epay/api/v1/order?testmode=true', array(
+			// 	'method'    => 'POST',
+			// 	'body'      => http_build_query( $payload ),
+			// 	'timeout'   => 90,
+			// 	'sslverify' => false,
+			// ));
 
 			// if ( is_wp_error( $response ) ) 
 			// 	throw new Exception('We are currently experiencing problems trying to connect to this payment gateway. Sorry for the inconvenience.');
@@ -382,19 +379,19 @@ function wc_gopayment_gateway_init() {
 			// // 1 or 4 means the transaction was a success
 			// if ( ( $r['response_code'] == 1 ) || ( $r['response_code'] == 4 ) ) {
 			// Payment has been successful
-			$order->update_status( 'completed', 'GOPay payment completed.');
+			// $order->update_status( 'completed', 'GOPay payment completed.');
 
 			// Mark order as Paid
 			// $order->payment_complete();
 
 			// Empty the cart (Very important step)
-			$woocommerce->cart->empty_cart();
+			// $woocommerce->cart->empty_cart();
 
 				// Redirect to thank you page
-				return array(
-					'result'   => 'success',
-					'redirect' => $this->get_return_url( $order ),
-				);
+				// return array(
+				// 	'result'   => 'success',
+				// 	'redirect' => $this->get_return_url( $order ),
+				// );
 			// } else {
 			// 	// Transaction was not succesful
 			// 	// Add notice to the cart
@@ -402,10 +399,56 @@ function wc_gopayment_gateway_init() {
 			// 	// Add note to the order for your reference
 			// 	$order->add_order_note( 'Error: '. $r['response_reason_text'] );
 			// }
+			
+
 		}
 
-		// public function callback_handler(){
-		// 	echo "here";
-		// }
+				/**
+		 *
+		 * @access public
+		 * @return void
+		 */
+		function webhook() { 
+
+      $order_id = isset($_GET['order_id']) ? $_GET['order_id'] : null;
+      $order = wc_get_order( $order_id );
+      $order->payment_complete();
+      wc_reduce_stock_levels($order_id);
+
+      return "true";
+
+			// if($_GET['reason']){
+			// 	wp_redirect( WC_Cart::get_cart_url());
+			// 	wc_add_notice( $_GET['reason'], 'error' );
+			// 	exit;
+			// }
+
+			// global $woocommerce;
+
+			// @ob_clean();
+
+			// $wc_order_id 	= $_REQUEST['order_id'];
+
+			// $compare_string = $_REQUEST['order_id'].$_REQUEST['total'].$this->api_key;
+
+			// $compare_hash1 = md5($compare_string);
+
+
+			// $compare_hash2 = $_REQUEST['hash'];
+			// if ($compare_hash1 != $compare_hash2) {
+			// 	wp_redirect( WC_Cart::get_cart_url());
+			// 	wc_add_notice("Wipay Hash Mismatch... check your secret word.", 'error' );
+			// 	exit;
+			// } else {
+			// 	$wc_order 	= new WC_Order( absint( $wc_order_id ) );
+			// 	// Mark order complete
+			// 	$wc_order->payment_complete();
+			// 	// Empty cart and clear session
+			// 	$woocommerce->cart->empty_cart();
+			// 	wp_redirect( $this->get_return_url( $wc_order ) );
+			// 	wc_add_notice('WIPAY ORDER NUMBER ' . $_REQUEST['order_number'] , 'success' );
+			// 	exit;
+			// }
+		}
   } // end \WC_GOPayment class
 }
