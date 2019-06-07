@@ -8,11 +8,11 @@
 **License:** MIT  
 **License URI:** https://github.com/GenuinelyOptimistic/gopay-woocommerce-plugin/blob/master/LICENSE  
 
-#### Description
+### Description
 
 A payment plugin for GOPay a product of Genuinely Optimistic
 
-#### Installation
+### Installation
 
 This section describes how to install the plugin and get it working.
 
